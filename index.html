@@ -329,11 +329,13 @@ var words = [
     function nextWord() {
         currentIndex = (currentIndex + 1) % words.length;
         renderWord();
+        setTimeout(playUK, 300);
     }
 
     function prevWord() {
         currentIndex = (currentIndex - 1 + words.length) % words.length;
         renderWord();
+        setTimeout(playUK, 300);
     }
 
     function renderWordList(filter) {
@@ -387,6 +389,7 @@ var words = [
     }
 
     renderWord();
+    setTimeout(playUK, 500);
     </script>
 </body>
 </html>
