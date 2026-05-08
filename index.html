@@ -834,6 +834,26 @@ var words = [
         var synth = window.speechSynthesis;
         var utter = new SpeechSynthesisUtterance(w);
         utter.lang = 'en-GB';
+        
+        // Try to find a female British voice
+        var voices = synth.getVoices();
+        var femaleGBVoice = voices.find(function(voice) {
+            return voice.lang.includes('en-GB') && voice.name.includes('Female');
+        });
+        if (!femaleGBVoice) {
+            femaleGBVoice = voices.find(function(voice) {
+                return voice.lang.includes('en-GB') && voice.name.toLowerCase().includes('samantha');
+            });
+        }
+        if (!femaleGBVoice) {
+            femaleGBVoice = voices.find(function(voice) {
+                return voice.lang.includes('en-GB');
+            });
+        }
+        if (femaleGBVoice) {
+            utter.voice = femaleGBVoice;
+        }
+        
         synth.speak(utter);
     }
 
