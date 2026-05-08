@@ -3,123 +3,390 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>单词背诵 - 英式发音</title>
+    <title>法律英语词汇 - 完整版</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; }
-        h1 { color: white; text-align: center; margin-bottom: 20px; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab { flex: 1; padding: 15px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 10px; cursor: pointer; font-size: 16px; }
-        .tab.active { background: white; color: #667eea; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: linear-gradient(135deg, #1a1a2e, #16213e); min-height: 100vh; padding: 15px; }
+        .container { max-width: 700px; margin: 0 auto; }
+        h1 { color: white; text-align: center; margin-bottom: 15px; font-size: 1.3rem; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
+        .tab { flex: 1; padding: 12px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 8px; cursor: pointer; font-size: 14px; }
+        .tab.active { background: #e94560; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .card { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); margin-bottom: 20px; }
+        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); margin-bottom: 15px; }
         .word-display { text-align: center; }
-        .word { font-size: 2.5rem; margin-bottom: 10px; }
-        .phonetic { color: #666; margin-bottom: 15px; }
-        .speaker-btn { font-size: 1.5rem; background: none; border: none; cursor: pointer; margin-bottom: 15px; }
-        .meaning { font-size: 1.2rem; line-height: 1.6; text-align: left; }
-        .meaning strong { color: #667eea; }
-        .btn-group { display: flex; gap: 10px; }
-        .btn { flex: 1; padding: 15px; border: none; border-radius: 10px; font-size: 1rem; cursor: pointer; }
-        .btn-danger { background: #f44336; color: white; }
-        .btn-success { background: #4caf50; color: white; }
-        .word-list { background: white; border-radius: 16px; padding: 20px; max-height: 400px; overflow-y: auto; }
-        .word-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
-        .word-item:hover { background: #f5f5f5; }
+        .word { font-size: 1.8rem; margin-bottom: 8px; color: #1a1a2e; font-weight: bold; }
+        .phonetic { color: #666; margin-bottom: 10px; font-style: italic; font-size: 0.9rem; }
+        .speaker-btn { font-size: 1rem; background: #e94560; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; margin-bottom: 10px; }
+        .meaning { font-size: 1rem; line-height: 1.6; text-align: left; color: #333; }
+        .meaning .cn { color: #e94560; font-weight: bold; margin-bottom: 5px; font-size: 1.1rem; }
+        .meaning .en { color: #555; font-style: italic; }
+        .progress { text-align: center; color: #666; margin-bottom: 10px; font-size: 0.85rem; }
+        .btn-group { display: flex; gap: 8px; }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 0.9rem; cursor: pointer; }
+        .btn-prev { background: #4a5568; color: white; }
+        .btn-next { background: #e94560; color: white; }
+        .word-list { background: white; border-radius: 12px; padding: 10px; max-height: 70vh; overflow-y: auto; }
+        .word-item { padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 0.85rem; }
+        .word-item:hover { background: #f9f9f9; }
+        .word-item b { color: #1a1a2e; }
+        .word-item span { color: #888; font-size: 0.75rem; }
+        .counter { color: #aaa; font-size: 0.8rem; text-align: center; margin-bottom: 10px; }
+        .search-box { width: 100%; padding: 10px; border: none; border-radius: 8px; margin-bottom: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>单词背诵</h1>
+        <h1>⚖️ 法律英语词汇 - 完整版</h1>
         <div class="tabs">
             <button class="tab active" onclick="switchTab('study')">学习</button>
-            <button class="tab" onclick="switchTab('list')">列表</button>
+            <button class="tab" onclick="switchTab('list')">词汇表 (<span id="total-count">0</span>)</button>
         </div>
         
         <div id="study" class="tab-content active">
+            <div class="progress" id="progress">当前: 1 / 0</div>
             <div class="card">
                 <div class="word-display">
-                    <div class="word" id="current-word">Hello</div>
-                    <button class="speaker-btn" onclick="playUK()">🔊</button>
-                    <div class="meaning" id="meaning">中文: 你好</div>
+                    <div class="word" id="current-word">Loading...</div>
+                    <div class="phonetic" id="phonetic"></div>
+                    <button class="speaker-btn" onclick="playUK()">🔊 英式发音</button>
+                    <div class="meaning">
+                        <div class="cn" id="meaning-cn"></div>
+                        <div class="en" id="meaning-en"></div>
+                    </div>
                 </div>
             </div>
             <div class="btn-group">
-                <button class="btn btn-danger" onclick="nextWord()">下一个</button>
-                <button class="btn btn-success" onclick="markKnown()">认识</button>
+                <button class="btn btn-prev" onclick="prevWord()">← 上一个</button>
+                <button class="btn btn-next" onclick="nextWord()">下一个 →</button>
             </div>
         </div>
         
         <div id="list" class="tab-content">
+            <input type="text" class="search-box" placeholder="搜索词汇..." onkeyup="filterWords(this.value)">
+            <div class="counter" id="counter">共 0 个词汇</div>
             <div class="word-list" id="word-list"></div>
         </div>
     </div>
     
     <script>
-    var words = [
-        {word: 'easement', meaning: '地役权'},
-        {word: 'negligence', meaning: '过失'},
-        {word: 'plaintiff', meaning: '原告'},
-        {word: 'defendant', meaning: '被告'},
-        {word: 'contract', meaning: '合同'},
-        {word: 'tort', meaning: '侵权'},
-        {word: 'evidence', meaning: '证据'},
-        {word: 'judge', meaning: '法官'},
-        {word: 'jury', meaning: '陪审团'},
-        {word: 'appeal', meaning: '上诉'},
-        {word: 'verdict', meaning: '裁决'},
-        {word: 'bail', meaning: '保释'},
-        {word: 'damages', meaning: '赔偿金'},
-        {word: 'trust', meaning: '信托'},
-        {word: 'copyright', meaning: '版权'},
-        {word: 'patent', meaning: '专利'},
-        {word: 'bankruptcy', meaning: '破产'},
-        {word: 'inheritance', meaning: '继承'},
-        {word: 'fraud', meaning: '欺诈'},
-        {word: 'murder', meaning: '谋杀'}
+var words = [
+{word: "easement", phonetic: "", meaning: "地役权", meaningEn: "A right to use another's land"},
+{word: "expressly granted easement", phonetic: "", meaning: "明确授予的地役权", meaningEn: "Easement explicitly granted"},
+{word: "foreseeability", phonetic: "", meaning: "可预见性", meaningEn: "Ability to foresee harm"},
+{word: "proximity", phonetic: "", meaning: "邻近性", meaningEn: "Nearness in relationship"},
+{word: "executor", phonetic: "", meaning: "遗嘱执行人", meaningEn: "Person administering a will"},
+{word: "executor's year", phonetic: "", meaning: "执行人之年", meaningEn: "First year after death to settle estate"},
+{word: "double jeopardy", phonetic: "", meaning: "一事不再理", meaningEn: "Protection against double trial"},
+{word: "Private Residence Relief", phonetic: "", meaning: "主要居所减免", meaningEn: "Tax relief on main residence"},
+{word: "innominate terms", phonetic: "", meaning: "中间条款", meaningEn: "Neither condition nor warranty"},
+{word: "contempt of court", phonetic: "", meaning: "藐视法庭", meaningEn: "Disrespect to court"},
+{word: "sub judice", phonetic: "", meaning: "未决案件", meaningEn: "Under judicial consideration"},
+{word: "Sentencing Council Guidelines", phonetic: "", meaning: "量刑委员会指南", meaningEn: "Official sentencing guidelines"},
+{word: "unfair dismissal", phonetic: "", meaning: "不公平解雇", meaningEn: "Wrongful termination"},
+{word: "specific performance", phonetic: "", meaning: "实际履行", meaningEn: "Court order to perform"},
+{word: "latent ambiguity", phonetic: "", meaning: "潜在歧义", meaningEn: "Hidden ambiguity"},
+{word: "patent ambiguity", phonetic: "", meaning: "表面歧义", meaningEn: "Obvious ambiguity"},
+{word: "overreaching", phonetic: "", meaning: "权益超越", meaningEn: "Taking unfair advantage"},
+{word: "insider dealing", phonetic: "", meaning: "内幕交易", meaningEn: "Trading on inside information"},
+{word: "adverse possession", phonetic: "", meaning: "逆权占有", meaningEn: "Hostile possession (10yr registered, 12yr unregistered)"},
+{word: "frolic", phonetic: "", meaning: "嬉戏", meaningEn: "Leisure activity"},
+{word: "joint and several liability", phonetic: "", meaning: "连带和个别责任", meaningEn: "Shared liability"},
+{word: "parliamentary sovereignty", phonetic: "", meaning: "议会主权", meaningEn: "Supreme authority of parliament"},
+{word: "struck off", phonetic: "", meaning: "除名", meaningEn: "Removed from register"},
+{word: "particulars of claim", phonetic: "", meaning: "索赔详情", meaningEn: "Details of claim"},
+{word: "tipping off", phonetic: "", meaning: "泄露罪", meaningEn: "Disclosing info to criminals"},
+{word: "strike out", phonetic: "", meaning: "驳回", meaningEn: "Dismiss a claim"},
+{word: "unfair prejudice remedy", phonetic: "", meaning: "不公平损害救济", meaningEn: "Unfair harm to shareholders remedy"},
+{word: "balance of probabilities", phonetic: "", meaning: "盖然性权衡", meaningEn: "Civil standard of proof"},
+{word: "vicarious liability", phonetic: "", meaning: "替代责任", meaningEn: "Employer liability for employee"},
+{word: "force majeure", phonetic: "", meaning: "不可抗力", meaningEn: "Unforeseeable circumstance"},
+{word: "due diligence", phonetic: "", meaning: "尽职调查", meaningEn: "Reasonable investigation"},
+{word: "consideration", phonetic: "", meaning: "对价", meaningEn: "Value exchanged in contract"},
+{word: "letter of credit", phonetic: "", meaning: "信用证", meaningEn: "Bank guarantee"},
+{word: "power of attorney", phonetic: "", meaning: "委托书", meaningEn: "Authority to act"},
+{word: "deed", phonetic: "", meaning: "契约", meaningEn: "Formal legal document"},
+{word: "covenant", phonetic: "", meaning: "契约条款", meaningEn: "Promise in deed"},
+{word: "release", phonetic: "", meaning: "释放", meaningEn: "Giving up a right"},
+{word: "assignment", phonetic: "", meaning: "转让", meaningEn: "Transfer of rights"},
+{word: "novation", phonetic: "", meaning: "债务更新", meaningEn: "Replacement of obligation"},
+{word: "waiver", phonetic: "", meaning: "放弃", meaningEn: "Voluntary surrender"},
+{word: "estoppel", phonetic: "", meaning: "禁反言", meaningEn: "Cannot contradict statement"},
+{word: "ratification", phonetic: "", meaning: "批准", meaningEn: "Confirmation"},
+{word: "ab initio", phonetic: "", meaning: "自始", meaningEn: "From the beginning"},
+{word: "a fortiori", phonetic: "", meaning: "更有理由", meaningEn: "With stronger reason"},
+{word: "bona fide", phonetic: "", meaning: "善意", meaningEn: "In good faith"},
+{word: "mala fide", phonetic: "", meaning: "恶意", meaningEn: "In bad faith"},
+{word: "de facto", phonetic: "", meaning: "事实上", meaningEn: "In fact"},
+{word: "de jure", phonetic: "", meaning: "法律上", meaningEn: "By law"},
+{word: "per se", phonetic: "", meaning: "本身", meaningEn: "By itself"},
+{word: "habeas corpus", phonetic: "", meaning: "人身保护令", meaningEn: "You shall have the body"},
+{word: "res judicata", phonetic: "", meaning: "既判力", meaningEn: "Matter already judged"},
+{word: "stare decisis", phonetic: "", meaning: "遵循先例", meaningEn: "Stand by decided matters"},
+{word: "prima facie", phonetic: "", meaning: "初步证据", meaningEn: "At first sight"},
+{word: "caveat emptor", phonetic: "", meaning: "买者自负", meaningEn: "Buyer beware"},
+{word: "quid pro quo", phonetic: "", meaning: "等价交换", meaningEn: "Something for something"},
+{word: "actus reus", phonetic: "", meaning: "犯罪行为", meaningEn: "Guilty act (objective)"},
+{word: "mens rea", phonetic: "", meaning: "犯罪意图", meaningEn: "Guilty mind (subjective)"},
+{word: "ex officio", phonetic: "", meaning: "依职权", meaningEn: "By virtue of office"},
+{word: "ex post facto", phonetic: "", meaning: "事后", meaningEn: "After the fact"},
+{word: "inter alia", phonetic: "", meaning: "除其他外", meaningEn: "Among other things"},
+{word: "mutatis mutandis", phonetic: "", meaning: "作必要修改后", meaningEn: "With necessary changes"},
+{word: "pro bono", phonetic: "", meaning: "公益性", meaningEn: "For public good"},
+{word: "ubi jus ibi remedium", phonetic: "", meaning: "有权利必有救济", meaningEn: "Where there is a right, there is a remedy"},
+{word: "lex non cogit ad impossibilia", phonetic: "", meaning: "法律不强人所难", meaningEn: "Law does not compel impossible"},
+{word: "nemo iudex in causa sua", phonetic: "", meaning: "任何人不得为自己案件的法官", meaningEn: "No one is judge in own cause"},
+{word: "ad litem", phonetic: "", meaning: "诉讼代理", meaningEn: "For the suit"},
+{word: "amicus curiae", phonetic: "", meaning: "法庭之友", meaningEn: "Friend of the court"},
+{word: "corpus delicti", phonetic: "", meaning: "犯罪事实", meaningEn: "Body of the crime"},
+{word: "de novo", phonetic: "", meaning: "重新审理", meaningEn: "Anew"},
+{word: "ejusdem generis", phonetic: "", meaning: "同类规则", meaningEn: "Of the same kind"},
+{word: "ex parte", phonetic: "", meaning: "单方面", meaningEn: "One party only"},
+{word: "forum non conveniens", phonetic: "", meaning: "不方便法院原则", meaningEn: "Inconvenient forum"},
+{word: "in camera", phonetic: "", meaning: "不公开", meaningEn: "In private"},
+{word: "in personam", phonetic: "", meaning: "对人", meaningEn: "Against the person"},
+{word: "in rem", phonetic: "", meaning: "对物", meaningEn: "Against the thing"},
+{word: "lis pendens", phonetic: "", meaning: "未决诉讼", meaningEn: "Pending lawsuit"},
+{word: "locus standi", phonetic: "", meaning: "诉讼资格", meaningEn: "Standing to sue"},
+{word: "mandamus", phonetic: "", meaning: "履行令", meaningEn: "We command"},
+{word: "noscitur a sociis", phonetic: "", meaning: "文理解释", meaningEn: "Known by associates"},
+{word: "obiter dictum", phonetic: "", meaning: "附带意见", meaningEn: "By the way"},
+{word: "ratio decidendi", phonetic: "", meaning: "判决理由", meaningEn: "Reason for deciding"},
+{word: "ex abundanti cautela", phonetic: "", meaning: "格外谨慎", meaningEn: "Out of abundant caution"},
+{word: "ex facie", phonetic: "", meaning: "从表面上", meaningEn: "On the face of it"},
+{word: "ex gratia", phonetic: "", meaning: "特惠", meaningEn: "As a favor"},
+{word: "in pari materia", phonetic: "", meaning: "同类事项", meaningEn: "Same subject matter"},
+{word: "ipso facto", phonetic: "", meaning: "依据事实", meaningEn: "By the fact itself"},
+{word: "nunc pro tunc", phonetic: "", meaning: "追溯生效", meaningEn: "Now for then"},
+{word: "sub rosa", phonetic: "", meaning: "秘密地", meaningEn: "Under the rose"},
+{word: "vice versa", phonetic: "", meaning: "反之亦然", meaningEn: "The other way around"},
+{word: "a mensa et thoro", phonetic: "", meaning: "法定分居", meaningEn: "From bed and board"},
+{word: "flagrante delicto", phonetic: "", meaning: "现行犯", meaningEn: "In the very act"},
+{word: "res gestae", phonetic: "", meaning: "事实行为", meaningEn: "Things done"},
+{word: "res ipsa loquitur", phonetic: "", meaning: "事实自证", meaningEn: "The thing speaks for itself"},
+{word: "expressio unius est exclusio alterius", phonetic: "", meaning: "明示其一即排除其他", meaningEn: "Expression of one excludes other"},
+{word: "volenti non fit injuria", phonetic: "", meaning: "自愿承担风险", meaningEn: "To willing person no injury"},
+{word: "consensus ad idem", phonetic: "", meaning: "合意", meaningEn: "Meeting of minds"},
+{word: "quantum meruit", phonetic: "", meaning: "按合理价值", meaningEn: "As much as he deserves"},
+{word: "damnum absque injuria", phonetic: "", meaning: "有损害无侵权", meaningEn: "Harm without legal wrong"},
+{word: "generalia specialibus non derogant", phonetic: "", meaning: "特别法优于一般法", meaningEn: "General does not derogate from special"},
+{word: "pari passu", phonetic: "", meaning: "同等地位", meaningEn: "Equally"},
+{word: "solutio sine causa", phonetic: "", meaning: "无因给付", meaningEn: "Payment without cause"},
+{word: "bona vacantia", phonetic: "", meaning: "无主财产", meaningEn: "Ownerless property"},
+{word: "cy pres", phonetic: "", meaning: "近似原则", meaningEn: "As near as possible"},
+{word: "nemo dat quod non habet", phonetic: "", meaning: "不得转让不属于自己的权利", meaningEn: "No one gives what they don't have"},
+{word: "per capita", phonetic: "", meaning: "按人头", meaningEn: "By head"},
+{word: "per stirpes", phonetic: "", meaning: "按支系", meaningEn: "By branch"},
+{word: "per autre vie", phonetic: "", meaning: "为他人终身", meaningEn: "For another's life"},
+{word: "terra nullius", phonetic: "", meaning: "无主地", meaningEn: "Nobody's land"},
+{word: "ultra vires", phonetic: "", meaning: "越权", meaningEn: "Beyond powers"},
+{word: "negligence", phonetic: "", meaning: "过失", meaningEn: "Failure to take care"},
+{word: "gross negligence", phonetic: "", meaning: "严重过失", meaningEn: "Extreme carelessness"},
+{word: "breach of contract", phonetic: "", meaning: "违约", meaningEn: "Violation of contract"},
+{word: "tort", phonetic: "", meaning: "侵权", meaningEn: "Civil wrong"},
+{word: "plaintiff", phonetic: "", meaning: "原告", meaningEn: "Person who sues"},
+{word: "defendant", phonetic: "", meaning: "被告", meaningEn: "Person sued"},
+{word: "jurisdiction", phonetic: "", meaning: "管辖权", meaningEn: "Authority of court"},
+{word: "evidence", phonetic: "", meaning: "证据", meaningEn: "Proof in court"},
+{word: "affidavit", phonetic: "", meaning: "宣誓书", meaningEn: "Statement under oath"},
+{word: "witness", phonetic: "", meaning: "证人", meaningEn: "Person giving evidence"},
+{word: "judge", phonetic: "", meaning: "法官", meaningEn: "Presiding officer"},
+{word: "jury", phonetic: "", meaning: "陪审团", meaningEn: "Trial decision makers"},
+{word: "verdict", phonetic: "", meaning: "裁决", meaningEn: "Decision"},
+{word: "appeal", phonetic: "", meaning: "上诉", meaningEn: "Request to higher court"},
+{word: "conviction", phonetic: "", meaning: "定罪", meaningEn: "Finding of guilt"},
+{word: "acquittal", phonetic: "", meaning: "无罪判决", meaningEn: "Not guilty verdict"},
+{word: "bail", phonetic: "", meaning: "保释", meaningEn: "Release from custody"},
+{word: "probation", phonetic: "", meaning: "缓刑", meaningEn: "Supervised release"},
+{word: "parole", phonetic: "", meaning: "假释", meaningEn: "Early release"},
+{word: "damages", phonetic: "", meaning: "赔偿金", meaningEn: "Monetary compensation"},
+{word: "injunction", phonetic: "", meaning: "禁令", meaningEn: "Court order"},
+{word: "arbitration", phonetic: "", meaning: "仲裁", meaningEn: "Dispute resolution"},
+{word: "mediation", phonetic: "", meaning: "调解", meaningEn: "Dispute mediation"},
+{word: "settlement", phonetic: "", meaning: "和解", meaningEn: "Agreement to end dispute"},
+{word: "liability", phonetic: "", meaning: "责任", meaningEn: "Legal responsibility"},
+{word: "offer", phonetic: "", meaning: "要约", meaningEn: "Proposal"},
+{word: "acceptance", phonetic: "", meaning: "承诺", meaningEn: "Agreement to offer"},
+{word: "capacity", phonetic: "", meaning: "能力", meaningEn: "Legal ability"},
+{word: "void", phonetic: "", meaning: "无效", meaningEn: "Not binding"},
+{word: "voidable", phonetic: "", meaning: "可撤销", meaningEn: "Can be cancelled"},
+{word: "unenforceable", phonetic: "", meaning: "不可执行", meaningEn: "Cannot be enforced"},
+{word: "statute", phonetic: "", meaning: "成文法", meaningEn: "Written law"},
+{word: "common law", phonetic: "", meaning: "普通法", meaningEn: "Law from precedent"},
+{word: "civil law", phonetic: "", meaning: "民法", meaningEn: "Private law"},
+{word: "criminal law", phonetic: "", meaning: "刑法", meaningEn: "Crime and punishment"},
+{word: "equity", phonetic: "", meaning: "衡平法", meaningEn: "Fairness law"},
+{word: "precedent", phonetic: "", meaning: "判例", meaningEn: "Earlier decision"},
+{word: "trust", phonetic: "", meaning: "信托", meaningEn: "Fiduciary relationship"},
+{word: "beneficiary", phonetic: "", meaning: "受益人", meaningEn: "Person who benefits"},
+{word: "trustee", phonetic: "", meaning: "受托人", meaningEn: "Person managing trust"},
+{word: "copyright", phonetic: "", meaning: "版权", meaningEn: "Exclusive right"},
+{word: "trademark", phonetic: "", meaning: "商标", meaningEn: "Brand identifier"},
+{word: "patent", phonetic: "", meaning: "专利", meaningEn: "Invention right"},
+{word: "trade secret", phonetic: "", meaning: "商业秘密", meaningEn: "Confidential info"},
+{word: "intellectual property", phonetic: "", meaning: "知识产权", meaningEn: "Creations of mind"},
+{word: "mortgage", phonetic: "", meaning: "抵押", meaningEn: "Property as security"},
+{word: "lien", phonetic: "", meaning: "留置权", meaningEn: "Right to retain"},
+{word: "debtor", phonetic: "", meaning: "债务人", meaningEn: "Person who owes"},
+{word: "creditor", phonetic: "", meaning: "债权人", meaningEn: "Person owed"},
+{word: "bankruptcy", phonetic: "", meaning: "破产", meaningEn: "State of insolvency"},
+{word: "liquidation", phonetic: "", meaning: "清算", meaningEn: "Winding up company"},
+{word: "probate", phonetic: "", meaning: "遗嘱认证", meaningEn: "Will validation"},
+{word: "inheritance", phonetic: "", meaning: "继承", meaningEn: "Receiving property"},
+{word: "heir", phonetic: "", meaning: "继承人", meaningEn: "Person who inherits"},
+{word: "testator", phonetic: "", meaning: "立遗嘱人", meaningEn: "Will maker"},
+{word: "will", phonetic: "", meaning: "遗嘱", meaningEn: "Legal document"},
+{word: "codicil", phonetic: "", meaning: "遗嘱附录", meaningEn: "Will amendment"},
+{word: "misrepresentation", phonetic: "", meaning: "虚假陈述", meaningEn: "False statement"},
+{word: "fraud", phonetic: "", meaning: "欺诈", meaningEn: "Deception"},
+{word: "duress", phonetic: "", meaning: "胁迫", meaningEn: "Coercion"},
+{word: "undue influence", phonetic: "", meaning: "不当影响", meaningEn: "Improper persuasion"},
+{word: "mistake", phonetic: "", meaning: "误解", meaningEn: "Error"},
+{word: "penalty", phonetic: "", meaning: "违约金", meaningEn: "Punishment"},
+{word: "liquidated damages", phonetic: "", meaning: "约定违约金", meaningEn: "Pre-determined amount"},
+{word: "proximate cause", phonetic: "", meaning: "近因", meaningEn: "Direct cause"},
+{word: "duty of care", phonetic: "", meaning: "注意义务", meaningEn: "Obligation to avoid harm"},
+{word: "standard of care", phonetic: "", meaning: "注意标准", meaningEn: "Reasonable standard"},
+{word: "reasonable", phonetic: "", meaning: "合理", meaningEn: "Fair and sensible"},
+{word: "foreseeable", phonetic: "", meaning: "可预见", meaningEn: "Reasonably expected"},
+{word: "strict liability", phonetic: "", meaning: "严格责任", meaningEn: "Liability without fault"},
+{word: "product liability", phonetic: "", meaning: "产品责任", meaningEn: "Product defect responsibility"},
+{word: "nuisance", phonetic: "", meaning: "妨害", meaningEn: "Interference with use"},
+{word: "defamation", phonetic: "", meaning: "诽谤", meaningEn: "Damage to reputation"},
+{word: "libel", phonetic: "", meaning: "书面诽谤", meaningEn: "Defamation in writing"},
+{word: "slander", phonetic: "", meaning: "口头诽谤", meaningEn: "Defamation in speech"},
+{word: "assault", phonetic: "", meaning: "袭击", meaningEn: "Threat of violence"},
+{word: "battery", phonetic: "", meaning: "殴打", meaningEn: "Unlawful contact"},
+{word: "trespass", phonetic: "", meaning: "非法侵入", meaningEn: "Unlawful entry"},
+{word: "conversion", phonetic: "", meaning: "侵占", meaningEn: "Taking property"},
+{word: "title", phonetic: "", meaning: "产权", meaningEn: "Ownership right"},
+{word: "freehold", phonetic: "", meaning: "永久产权", meaningEn: "Perpetual ownership"},
+{word: "leasehold", phonetic: "", meaning: "租赁权", meaningEn: "Rental ownership"},
+{word: "solicitor", phonetic: "", meaning: "事务律师", meaningEn: "UK lawyer (non-litigation)"},
+{word: "barrister", phonetic: "", meaning: "出庭律师", meaningEn: "UK trial lawyer"},
+{word: "attorney", phonetic: "", meaning: "律师", meaningEn: "Legal representative"},
+{word: "notary", phonetic: "", meaning: "公证人", meaningEn: "Document witness"},
+{word: "magistrate", phonetic: "", meaning: "治安法官", meaningEn: "Lower court judge"},
+{word: "justice", phonetic: "", meaning: "法官", meaningEn: "Judge"},
+{word: "chancellor", phonetic: "", meaning: "大法官", meaningEn: "Head of equity court"},
+{word: "chief justice", phonetic: "", meaning: "首席法官", meaningEn: "Head of court"},
+{word: "litigant", phonetic: "", meaning: "诉讼当事人", meaningEn: "Party to lawsuit"},
+{word: "appellant", phonetic: "", meaning: "上诉人", meaningEn: "Person who appeals"},
+{word: "respondent", phonetic: "", meaning: "被上诉人", meaningEn: "Person responding"},
+{word: "petitioner", phonetic: "", meaning: "申请人", meaningEn: "Person who petitions"},
+{word: "claimant", phonetic: "", meaning: "索赔人", meaningEn: "Person making claim"},
+{word: "beyond reasonable doubt", phonetic: "", meaning: "无合理怀疑", meaningEn: "Criminal standard of proof"},
+{word: "burden of proof", phonetic: "", meaning: "举证责任", meaningEn: "Obligation to prove"},
+{word: "circumstantial evidence", phonetic: "", meaning: "间接证据", meaningEn: "Indirect evidence"},
+{word: "hearsay", phonetic: "", meaning: "传闻证据", meaningEn: "Secondhand evidence"},
+{word: "affirmative defense", phonetic: "", meaning: "积极抗辩", meaningEn: "Defense admitting but justifying"},
+{word: "alibi", phonetic: "", meaning: "不在场证明", meaningEn: "Proof of elsewhere"},
+{word: "arson", phonetic: "", meaning: "纵火罪", meaningEn: "Criminal fire"},
+{word: "kidnap", phonetic: "", meaning: "绑架", meaningEn: "Taking by force"},
+{word: "extortion", phonetic: "", meaning: "勒索", meaningEn: "Obtaining by threat"},
+{word: "embezzlement", phonetic: "", meaning: "挪用公款", meaningEn: "Theft by employee"},
+{word: "perjury", phonetic: "", meaning: "伪证", meaningEn: "False oath"},
+{word: "bribery", phonetic: "", meaning: "贿赂", meaningEn: "Offering bribes"},
+{word: "bigamy", phonetic: "", meaning: "重婚罪", meaningEn: "Marriage to two"},
+{word: "incest", phonetic: "", meaning: "乱伦", meaningEn: "Sex between relatives"},
+{word: "homicide", phonetic: "", meaning: "杀人", meaningEn: "Killing"},
+{word: "manslaughter", phonetic: "", meaning: "过失杀人", meaningEn: "Killing without intent"},
+{word: "felony", phonetic: "", meaning: "重罪", meaningEn: "Serious crime"},
+{word: "misdemeanor", phonetic: "", meaning: "轻罪", meaningEn: "Minor crime"},
+{word: "indictment", phonetic: "", meaning: "起诉书", meaningEn: "Formal accusation"},
+{word: "arraignment", phonetic: "", meaning: "传讯", meaningEn: "First appearance"},
+{word: "plea", phonetic: "", meaning: "答辩", meaningEn: "Defendant's answer"},
+{word: "sentencing", phonetic: "", meaning: "量刑", meaningEn: "Punishment decision"},
+{word: "restitution", phonetic: "", meaning: "赔偿", meaningEn: "Compensation"},
+{word: "restraining order", phonetic: "", meaning: "限制令", meaningEn: "Stop order"},
+{word: "subpoena", phonetic: "", meaning: "传票", meaningEn: "Order to appear"},
+{word: "search warrant", phonetic: "", meaning: "搜查令", meaningEn: "Order to search"},
+{word: "writ", phonetic: "", meaning: "令状", meaningEn: "Written court order"},
+{word: "recidivist", phonetic: "", meaning: "累犯", meaningEn: "Repeat offender"},
+{word: "mitigating circumstances", phonetic: "", meaning: "减轻情节", meaningEn: "Factors reducing punishment"}
     ];
-    
+
     var currentIndex = 0;
-    
-    function switchTab(tab) {
+
+    function switchTab(tabId) {
         document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
         document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
         event.target.classList.add('active');
-        document.getElementById(tab).classList.add('active');
-        if(tab === 'list') renderList();
+        document.getElementById(tabId).classList.add('active');
+        if(tabId === 'list') renderWordList();
     }
-    
-    function displayWord() {
+
+    function renderWord() {
         var w = words[currentIndex];
         document.getElementById('current-word').textContent = w.word;
-        document.getElementById('meaning').textContent = w.meaning;
+        document.getElementById('phonetic').textContent = w.phonetic;
+        document.getElementById('meaning-cn').textContent = w.meaning;
+        document.getElementById('meaning-en').textContent = w.meaningEn;
+        document.getElementById('progress').textContent = '当前: ' + (currentIndex + 1) + ' / ' + words.length;
     }
-    
+
     function nextWord() {
         currentIndex = (currentIndex + 1) % words.length;
-        displayWord();
+        renderWord();
     }
-    
-    function markKnown() {
-        nextWord();
+
+    function prevWord() {
+        currentIndex = (currentIndex - 1 + words.length) % words.length;
+        renderWord();
     }
-    
+
+    function renderWordList(filter) {
+        var list = document.getElementById('word-list');
+        list.innerHTML = '';
+        var filtered = words;
+        if (filter) {
+            filter = filter.toLowerCase();
+            filtered = words.filter(function(w) { 
+                return w.word.toLowerCase().indexOf(filter) >= 0 || w.meaning.indexOf(filter) >= 0; 
+            });
+        }
+        filtered.forEach(function(w, i) {
+            var item = document.createElement('div');
+            item.className = 'word-item';
+            item.innerHTML = '<b>' + w.word + '</b> <span>' + w.meaning + '</span>';
+            item.onclick = function() {
+                currentIndex = words.indexOf(w);
+                renderWord();
+                switchTab('study');
+            };
+            list.appendChild(item);
+        });
+        document.getElementById('total-count').textContent = words.length;
+        document.getElementById('counter').textContent = '共 ' + filtered.length + ' 个词汇';
+    }
+
+    function filterWords(val) {
+        renderWordList(val);
+    }
+
     function playUK() {
         var w = words[currentIndex].word;
-        var url = 'https://dictionary.cambridge.org/media/english/uk_pron/u/uk' + w.charAt(0) + '/uk_' + w + '_GB_1.mp3';
-        new Audio(url).play().catch(function() { alert('发音不可用'); });
+        var wordForUrl = w.replace(/[^a-zA-Z\s]/g, '').trim().split(/\s+/)[0];
+        
+        // Use browser built-in speech synthesis
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            var utter = new SpeechSynthesisUtterance(wordForUrl);
+            utter.lang = 'en-GB';
+            utter.rate = 0.8;
+            utter.pitch = 1;
+            // Try to get a British voice
+            var voices = window.speechSynthesis.getVoices();
+            var ukVoice = voices.find(function(v) { return v.lang.indexOf('GB') >= 0 || v.lang.indexOf('en-GB') >= 0; });
+            if (ukVoice) utter.voice = ukVoice;
+            window.speechSynthesis.speak(utter);
+        } else {
+            alert('您的浏览器不支持语音合成');
+        }
     }
-    
-    function renderList() {
-        var list = document.getElementById('word-list');
-        list.innerHTML = words.map(function(w, i) {
-            return '<div class="word-item" onclick="currentIndex=' + i + '; switchTab(\'study\'); displayWord()"><b>' + w.word + '</b> - ' + w.meaning + '</div>';
-        }).join('');
-    }
-    
-    displayWord();
+
+    renderWord();
     </script>
 </body>
 </html>
